@@ -63,7 +63,7 @@ export default class Despensa {
         return list;
     }
     async deleteDespensa(userId){
-    return await onDeleteDespensa(this._id, userId)
+       return await onDeleteDespensa(this._id, userId)
     }
     deleteItem(id){
        this.items = this.items.filter(element => {
@@ -74,7 +74,7 @@ export default class Despensa {
     }
     deleteUserShared(id) {
         let list = this.user_shareds.filter(element=>{
-            console.log(element)
+
             if(element.user != id){
                 return element;
             }
@@ -85,7 +85,7 @@ export default class Despensa {
          this.user_shareds.push(data)
     }
     async onItemUpdate(data) {
-        this.items = this.items.map(element=>element._id === data._id ? data : element)
+        this.items = this.items.map(element=>element._id == data._id ? data : element)
     }
 
     filterCategoria(string){

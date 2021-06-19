@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Surface, Button, Portal, Avatar, IconButton, Dialog, Chip, RadioButton, Searchbar, TouchableRipple, Text, TextInput, Paragraph, Snackbar, Title, ActivityIndicator, Card, Divider, List, FAB, Subheading } from 'react-native-paper';
+import { Surface, Button, Portal,  IconButton, Dialog, Chip,  Searchbar, Text, TextInput, Snackbar, Title, ActivityIndicator, Divider, List, FAB, Subheading } from 'react-native-paper';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Picker } from '@react-native-picker/picker';
 import { Animated, View, Image, addons, FlatList, ScrollView } from 'react-native';
@@ -73,15 +73,30 @@ export default function DespensaView({route}) {
     }, [])
     
     async function updateItem(userId, itemId, status, openDate, nivel, updatedAt, name, UN, quantidade, valor, total, validade, updateUser, categoria) {
-        setAnimating(true)
         try {
-            const response = await  despensa.onItemUpdate(userId, itemId, status, openDate, nivel, updatedAt, name, UN, quantidade, valor, total, validade, updateUser, categoria)
-            setItems(despensa.items)
-            setAnimating(false)
-  //        setDespensa(new Despensa(data._id, data.name, data.user, data.items, data.user_shareds, data.userUpdate, data.updatedAt));
-      //      onSnack(true, "Item atualizado", true)
+
+        await onUpdateItem(userId, itemId, status, openDate, 
+            nivel, 
+            updatedAt, 
+            name, 
+            UN, 
+            quantidade, 
+            valor, 
+            total,
+            validade, 
+            updateUser, 
+            categoria).then(resp=>{
+                 despensa.onItemUpdate(resp.data);
+                setItems(despensa.items)
+                hidleDialogEditProduct()
+            }).catch(e=>{
+                const {response} =e;
+                console.log(response)
+            })
+            onSnack(true, "Item atualizado", true)
         } catch (error) {
             setAnimating(false)
+            console.log(error.response)
             const { response } = error
             onSnack(true, ExpErr(response.status, response.data), false)   
         }
@@ -105,6 +120,7 @@ export default function DespensaView({route}) {
     async function deletedItem(despensaId, itemId, userId) {
         await onDeleteItem(despensaId, itemId, userId).then(response => {
             despensa.deleteItem(itemId)
+            setItems(despensa.items)
             setItems(despensa.items)
             onSnack(true, "Item deleteado", true)
         })
@@ -134,14 +150,12 @@ export default function DespensaView({route}) {
         setDate(new Date(item.validade))
     }  
     function ListProducts( value ) {
-
        return (
            value.map((data, key)=>{
             const diffValidade = stringDiffDate(data.validade, new Date())
             const vencido = new Date(data.validade) < new Date()
             const diffOpen = stringDiffDate(data.openDate, new Date())
             const diffCreated = stringDiffDate(data.createdAt, new Date())
-           
             return (
          
                 <Surface key={key} style={{ elevation: 1, backgroundColor: '#fff', margin: 5, borderRadius: 10, padding: 5 }}>
@@ -301,12 +315,10 @@ export default function DespensaView({route}) {
                                 onChangeText={setTextValor}
                             />
                         </View>
-                  
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <View>
-                            <Text style={{color: '#c7c7c7'}}>Validade</Text>
-                            <IconButton icon='calendar' size={30} />
+                            <Text style={{color: '#c7c7c7', textAlign:'center'}}>Validade</Text>
                         </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <DatePicker
                             date={date}
                             mode='date'

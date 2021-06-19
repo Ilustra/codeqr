@@ -44,6 +44,7 @@ export default function Dashbard({ navigation }) {
   const handlePress = () => setExpanded(!expanded);
   const [objUser, setObjUser] = useState();
   const [user, setUser] = useState();
+  const [avatarImage, setIvatarImage] = useState()
   const [nota, setNota] = useState([]);
   const [open, setOpen] = useState();
   const onStateChange = () => setOpen(!open);
@@ -97,6 +98,7 @@ export default function Dashbard({ navigation }) {
       setAnimating(true)
       const _user = realm.objects('User')
       setUser(_user[0]);
+      setIvatarImage(_user[0].photoURL);
       setObjUser(new UserAuth(_user[0]._id, _user[0].email, _user[0].password))
 
       await getNotas(_user[0]._id, 10, 1, _user[0].token)
@@ -155,8 +157,6 @@ export default function Dashbard({ navigation }) {
       onSnack(true, ExpErr(response.status, response.data), false)
     })
   }
-
-
 
   function ItemNota({ data }) {
     function onNavigate(route, data) {
@@ -283,8 +283,15 @@ export default function Dashbard({ navigation }) {
             </Submit>
 
           </View>
-          <View color='#000' style={{ flexDirection: 'row', margin: 10 }}>
+          <View color='#000' style={{ flexDirection: 'row', margin: 10, alignItems:'center' }}>
+
             <Text style={{ fontSize: 18, color: '#000' }}>{user ? ` Olá, ${user.first_name != "" ? user.first_name : user.name}` : 'Olá, Visitante'}</Text>
+            {avatarImage == 'photoURL' ?
+            null
+               :
+               <Avatar.Image size={35} source={{uri: avatarImage}} /> 
+            }
+  
           </View>
         </BoxRow>
       </Surface>
@@ -315,7 +322,7 @@ export default function Dashbard({ navigation }) {
             <ActivityIndicator animating={animating} />
             :
             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: -10 }}>
-              <IconButton icon='refresh' style={{ textAlign: 'center' }} color='#c7c7c7' onPress={() => reloadGEt('REFRESH')} size={20} clor='#505050' />
+              <IconButton icon='refresh' style={{ textAlign: 'center' }} color='#c7c7c7' onPress={() => reloadGEt('INITIAL')} size={20} clor='#505050' />
             </View>
           }
           <MenssagemLength data={{ tamanho: nota.length, message: 'Você não possui lançamentos' }} />

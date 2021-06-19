@@ -63,8 +63,6 @@ export default function Dashbard({ navigation }) {
             try {
                 setAnimating(true)
                 const _isconnected = await onConected()
-
-
                 const realm = await getRealm();
                 const _user = realm.objects('User')
                 setUser(_user[0]);
@@ -75,6 +73,7 @@ export default function Dashbard({ navigation }) {
                     .then(response => {
                         onDismissIndicator()
                         const { data } = response
+                        console.log(data[0].user_shareds)
                         if (data) {
                             setDespensas(data)
                             setDespensa(new Despensa(data[0]._id, data[0].name, data[0].user, data[0].items, data[0].user_shareds, data[0].userUpdate, data[0].updatedAt))
@@ -91,11 +90,11 @@ export default function Dashbard({ navigation }) {
 
         }
         initializaion();
-
     }, [])
     async function getUser(email) {
         await onUser(email).then(response => {
             const { data } = response
+            console.log(data)
             setShareUser(data);
         })
             .catch(error => {
@@ -126,19 +125,19 @@ export default function Dashbard({ navigation }) {
     }
 
     async function onUpdate(userId, itemId, status, openDate, nivel, updatedAt, name, UN, quantidade, valor, total, validade, updateUser, categoria) {
-            setAnimating(true)
-         await onUpdateItem(userId, itemId, status, openDate, nivel, updatedAt, name, UN, quantidade, valor, total, validade, updateUser, categoria)
-        .then(response=>{  
-            setAnimating(false)
-            const {data} = response
-            despensa.onItemUpdate(data)
-            setDespensa(despensa)
-        })
-        .catch(error=>{
-            setAnimating(false)
-            const {response} = error
-            onSnack(true, ExpErr(response.status, response.data), false)
-        })
+        setAnimating(true)
+        await onUpdateItem(userId, itemId, status, openDate, nivel, updatedAt, name, UN, quantidade, valor, total, validade, updateUser, categoria)
+            .then(response => {
+                setAnimating(false)
+                const { data } = response
+                despensa.onItemUpdate(data)
+                setDespensa(despensa)
+            })
+            .catch(error => {
+                setAnimating(false)
+                const { response } = error
+                onSnack(true, ExpErr(response.status, response.data), false)
+            })
     }
     function ListProductOpen({ data }) {
         const { _id, status, name, quantidade, nivel, validade, UN } = data
@@ -201,6 +200,7 @@ export default function Dashbard({ navigation }) {
 
     function ListDespensa({ data }) {
         const { name } = data
+
         return (
             <Chip style={{ margin: 5 }} onPress={() => setDespensa(new Despensa(data._id, data.name, data.user, data.items, data.user_shareds, data.userUpdate, data.updatedAt))} onLongPress={() => setDialogDeleteDespensa(true)}>{name}</Chip>
         )
@@ -217,6 +217,7 @@ export default function Dashbard({ navigation }) {
     }
     function ListUsersShared({ data }) {
         const { name } = data
+        console.log(data)
         if (user._id == despensa.user) {
             return (
                 <Chip style={{ margin: 5 }} onPress={() => onOpenDialogSharedUser(data)} >{name}</Chip>
@@ -235,24 +236,25 @@ export default function Dashbard({ navigation }) {
         }
         navigation.navigate('DespensaView', { despensa })
     }
-    async function addUserShared(despensaId, userId, name ){
+    async function addUserShared(despensaId, userId, name) {
         //despensa.addShareUser(shareUser.nome)
-        await onAddUserShare(userId, name, despensaId).then(r=>{
-            const {data} = r
+        await onAddUserShare(userId, name, despensaId).then(r => {
+            const { data } = r
+            console.log('add', data)
             despensa.addShareUser(data)
             setDespensa(despensa)
-        })  
-        .catch(error=>{
-            const { response } = error
-            onSnack(true, ExpErr(response.status, response.data), false)
         })
+            .catch(error => {
+                const { response } = error
+                onSnack(true, ExpErr(response.status, response.data), false)
+            })
     }
-    async function deleteShreUser(despensaId, userId){
+    async function deleteShreUser(despensaId, userId) {
         await onDeleteUserShare(despensaId, userId).then(response => {
-           const {data} = response 
-           despensa.deleteUserShared(userId)
-           setDespensa(despensa)
-           onSnack(true, 'Usuário deleteado', true)
+            const { data } = response
+            despensa.deleteUserShared(userId)
+            setDespensa(despensa)
+            onSnack(true, 'Usuário deleteado', true)
         }).catch(error => {
             const { response } = error
             onSnack(true, ExpErr(response.status, response.data), false)
@@ -293,18 +295,25 @@ export default function Dashbard({ navigation }) {
                     <Surface style={{ elevation: 2, padding: 10, margin: 5, borderRadius: 10, backgroundColor: '#fff' }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{}}>
-                                <Text style={{ color: '#505050' }}>Total:  {despensa.items.length}</Text>
-                                <Text style={{ color: '#505050' }}>Produtos abertos: {despensa.open().length} </Text>
+                                <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                <View>
+                                     <Text style={{ color: '#505050' }}>Total:  {despensa.items.length}</Text>
+                                     <Text style={{ color: '#505050' }}>Produtos abertos: {despensa.open().length} </Text>
+                                </View>
+                                   <IconButton
+                                    icon="window-open"
+                                    size={30}
+                                     style={{ backgroundColor: '#fc6500' }}
+                                     color='#fff'
+                                      onPress={() => navigation.navigate('DespensaView', { despensa })}
+                                  />
+                                </View>
+                             
+
                                 {despensa.userUpdate ? <Text style={{ color: '#303030', fontSize: 12 }}>Última atualização: {despensa.userUpdate} {stringDate(despensa.updatedAt)}</Text>
                                     : null}
                             </View>
-                            <IconButton
-                                icon="window-open"
-                                size={30}
-                                style={{ backgroundColor: '#fc6500' }}
-                                color='#fff'
-                                onPress={() => navigation.navigate('DespensaView', { despensa })}
-                            />
+                
                         </View>
                     </Surface>
                     <Text style={{ color: '#c7c7c7' }}>+detalhes</Text>
@@ -318,12 +327,14 @@ export default function Dashbard({ navigation }) {
                             <IconButton icon='eye' onPress={() => { onNavigate(despensa, despensa.validade()) }} style={{ margin: -5 }} />
                         </View>
                     </Surface>
-                    <Surface style={{}}>
+                    <Surface style={{flex: 1}}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                             <Text style={{ color: '#c7c7c7' }}>{text_status ? 'Produtos abertos' : 'Produtos Fechados'}</Text>
                             <IconButton style={{ margin: -5 }} onPress={() => { setTextStatus(!text_status) }} icon={text_status ? 'toggle-switch' : 'toggle-switch-off'} color={text_status ? '#00C441' : '#505050'} size={32} />
 
                         </View>
+
+
                         <ListFlat
                             numColumns={3}
                             data={text_status ? despensa.open() : despensa.closed()}
@@ -472,7 +483,7 @@ export default function Dashbard({ navigation }) {
                 <Dialog visible={dialogUserShared} onDismiss={hidleDialogUserShare}>
                     <Dialog.Content>
                         <Text style={{ textAlign: 'center', fontSize: 16 }}>{openUserShared.name}</Text>
-                        <Button onPress={() => deleteShreUser(despensa._id, openUserShared.user )}>deletar</Button>
+                        <Button onPress={() => deleteShreUser(despensa._id, openUserShared.user)}>deletar</Button>
                     </Dialog.Content>
                 </Dialog>
                 <Dialog visible={isDialogDeleteDespensa} onDismiss={hidleDialogDeleteDespensa}>

@@ -16,6 +16,10 @@ import MenssagemLength from '../MenssagemLength';
 import { getNotas, getBallance } from '../../Controller/ControllerNotas';
 import { onGetDespensa, onPushProdutos} from '../../Controller/controller-despensa';
 import { stringDate, compareListBy_id } from '../bibliotecas_functions';
+import { BannerAd, BannerAdSize, TestIds } from '@react-native-firebase/admob';
+
+import {IDBanner} from '../variaveis'
+const adUnitId = IDBanner;
 
 var uuid = require('react-native-uuid');
 
@@ -286,7 +290,7 @@ export default function Notas({ navigation: { navigate } }) {
           keyExtractor={item => String(item._id)}
           renderItem={({ item }) => <Repository data={item} />}
         />
-     
+
         <DataTable style={{backgroundColor:'#fff', margin: 0, padding: 0}}>
           <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
           <Button onPress={()=>{navigate('SerachProducts')}} icon='file-search'>PRODUTOS</Button>
@@ -346,7 +350,13 @@ export default function Notas({ navigation: { navigate } }) {
         </Snackbar>
       </Portal>
 
-
+      <BannerAd
+      unitId={adUnitId}
+      size={BannerAdSize.FULL_BANNER}
+      requestOptions={{
+        requestNonPersonalizedAdsOnly: true,
+      }}
+    />
     </Surface>
   );
 }

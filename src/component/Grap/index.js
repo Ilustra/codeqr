@@ -89,7 +89,6 @@ export default function Grap({ translateY }) {
     getMeta(current.getMonth())
     const start = new Date(current.getFullYear(), current.getMonth(), 1)
     const end = new Date(current.getFullYear(), current.getMonth() + 1, 0)
-    //console.log('start', start, 'end', end)
     getBetweenNotas(user._id, start, end)
 
   }
@@ -110,7 +109,7 @@ export default function Grap({ translateY }) {
     }
   }
   function legendDay(data) {
-    console.log(data)
+
     const lists = data.sort()
     return (
       lists.map((element, key) => {
@@ -141,10 +140,8 @@ export default function Grap({ translateY }) {
     }
 
     getMeta(current.getMonth())
-    // console.log(now.getMonth())
     const start = new Date(current.getFullYear(), current.getMonth(), 1)
     const end = new Date(current.getFullYear(), current.getMonth() + 1, 0)
-    console.log('start', start, 'end', end)
     getBetweenNotas(user._id, start, end)
 
   }

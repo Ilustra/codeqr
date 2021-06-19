@@ -8,7 +8,7 @@ export async function onCreate(value) {
       password: value.password,
     });
 }
-export async function onCreateSocial(email,name, uid, provider, password, token){
+export async function onCreateSocial(email, name, uid, provider, password, token){
   return await api.post ('user/register', {
     email, name, uid, provider, password
   }, 

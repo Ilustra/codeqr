@@ -152,7 +152,6 @@ export default function Camera({navigation: {navigate}}) {
         onDismissProgress()
         interstitial.load()
         interstitial.onAdEvent(type=>{
-          console.log('type falsed', type)
           if(type === AdEventType.LOADED){
               interstitial.show();
           }
@@ -182,7 +181,6 @@ export default function Camera({navigation: {navigate}}) {
         }
       }
     }
-
     return (
       <>
         <RNCamera
@@ -194,8 +192,6 @@ export default function Camera({navigation: {navigate}}) {
       </>
     );
   }
-
-
 }
 
 const styles = StyleSheet.create({

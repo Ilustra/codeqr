@@ -14,6 +14,7 @@ import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import auth from '@react-native-firebase/auth';
 import firebase from '@react-native-firebase/app';
 import {onCreateSocial} from '../../Controller/ControllerUser';
+
 import { ExpErr } from '../expecptions'
 import AuthContext from '../../context/auth'
 import getRealm from '../../services/realm';
@@ -73,7 +74,6 @@ export default function Login({ navigation }) {
 
   async function onSingIn(textEmail, textPassword) {
     setIslogin(true);
-  
     if (textEmail != '' && textPassword != '') {
       await auth().signInWithEmailAndPassword(textEmail, textPassword)
       .then(async(response) => {
@@ -81,16 +81,12 @@ export default function Login({ navigation }) {
         // Signed in
         const user = auth().currentUser
         const token = await user.getIdToken()
-    
-       // console.log(r.providerData)
        await createUsersocial(email, displayName, uid, providerId, password, token, 'photoURL')
       })
       .catch((error) => {
         setIslogin(false);
         var errorCode = error.code;
         var errorMessage = error.message;
-
-        console.log('errorCode',errorMessage)
         onSnack(true, errorMessage.message, false)
       });
     } else {
@@ -102,7 +98,6 @@ export default function Login({ navigation }) {
   async function onFacebookButtonPress() {
     // Attempt login with permissions
     const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
-
     if (result.isCancelled) {
       throw 'User cancelled the login process';
     }
@@ -113,10 +108,8 @@ export default function Login({ navigation }) {
     }
     // Create a Firebase credential with the AccessToken
     const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-
     // Sign-in the user with the credential
     return  auth().signInWithCredential(facebookCredential);
-  
   }
 
   function Navigate(string) {
@@ -148,14 +141,14 @@ export default function Login({ navigation }) {
             uid: uid, 
             provider: providerId, 
             token,
-            photoURL,
+            photoURL: photoURL ? photoURL : '',
             password
           }, 'modified')
         })  
         await signIn({ token: token });
       } catch (error) {
+
         const {response} = error
-        console.log('create uer', error)
         onSnack(true, ExpErr(response.status, response.data), false)
       }
     })
@@ -230,6 +223,7 @@ export default function Login({ navigation }) {
                   color="#3b5998"
                   onPress={ () => onFacebookButtonPress().then(async response => {
                     try {
+                      console.log(response.user)
                       const user = auth().currentUser
                       const token = await user.getIdToken()
                       const {displayName, email, uid, providerId} = response.user
