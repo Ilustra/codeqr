@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Surface, Button, Portal, IconButton, Dialog, Snackbar, Avatar, Title, ActivityIndicator, Colors, Divider, List, FAB, Subheading } from 'react-native-paper';
+import { Surface, Button, Portal, IconButton, Dialog, Provider, Snackbar, Avatar, Title, ActivityIndicator, Menu, Colors, Divider, Card, List, FAB, Subheading } from 'react-native-paper';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import { Text, Animated, View, Image } from 'react-native';
+import { Text, Animated, View, Image, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ExpErr } from '../expecptions'
 import getRealm from '../../services/realm';
@@ -36,8 +36,12 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
 
 export default function Dashbard({ navigation }) {
 
-  const { signIn } = React.useContext(AuthContext);
-
+  //menu
+  const [visible, setVisible] = useState(false);
+  const [itemMenu, setItemMenu] = useState();
+  const [positionMenu, setPositionMenu] = useState({ x: 150, y:150});
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const [expanded, setExpanded] = React.useState(true);
   //
@@ -80,8 +84,6 @@ export default function Dashbard({ navigation }) {
         setIsdialogDelete(true)
       }
     })
-
-
   }
 
   let LOADED = false
@@ -97,6 +99,7 @@ export default function Dashbard({ navigation }) {
       const realm = await getRealm();
       setAnimating(true)
       const _user = realm.objects('User')
+      console.log(_user)
       setUser(_user[0]);
       setIvatarImage(_user[0].photoURL);
       setObjUser(new UserAuth(_user[0]._id, _user[0].email, _user[0].password))
@@ -157,54 +160,76 @@ export default function Dashbard({ navigation }) {
       onSnack(true, ExpErr(response.status, response.data), false)
     })
   }
+  function onMenu(value){
+    setVisible(true)
+    setItemMenu(value);
 
-  function ItemNota({ data }) {
-    function onNavigate(route, data) {
-      navigation.navigate(route, data)
-    }
-    const {
-      _id,
-      nome,
-      itens,
-      pagamento,
-      total,
-      emissao,
-    } = data
+  }
+  function ItemNota(value) {
+
     return (
-      <View style={{ elevation: 2 }}>
+      value.map((data, key) => {
+        const {
+          _id,
+          nome,
+          itens,
+          pagamento,
+          total,
+          emissao,
+          descontos,
+          subTotal, url
+        } = data
+        console.log(pagamento)
+        return (
+          <Card key={key} style={{ elevation: 1, backgroundColor: '#fff', marginLeft: 5, marginRight: 5, marginBottom: 5, borderRadius: 5, padding: 10 }}>
 
-        <List.AccordionGroup>
-          <List.Accordion
-            style={{ fontWeight: 'bold' }} id={_id} title={'R$ ' + total.toFixed(2).replace('.', ',') + ' '} description={stringDate(emissao)}
-          >
-            <Surface style={{ margin: 5 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 10 }}>
-                <View>
-                  <Text style={{ fontWeight: 'bold', width: 170 }}>{nome}</Text>
-                  <Text>{itens} produtos(s)</Text>
+                <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                <Text style={{ fontSize: 16, color: '#757575' }}>{nome.substr(0, 20)}...</Text>
+                <IconButton
+                      style={{margin: -5, padding: -5}}
+                        color='#9c9c9c'
+                        icon='dots-vertical'
+                        size={20}
+                       
+                        onPress={() => onMenu(data)}
+                        
+                      />
+                             
                 </View>
-                <View style={{ flexDirection: 'row' }}>
-                  <IconButton
-                    icon="delete"
-                    color={Colors.red500}
-                    size={30}
-                    onPress={() => showDialogDelete(_id)}
-                  />
-                  <IconButton
-
-                    color='#9c9c9c'
-                    icon="open-in-new"
-                    size={30}
-                    onPress={() => onNavigate('DetalheNota', { data })}
-                  />
-                </View>
+            
+                <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+              <View style={{marginLeft: 5, fontSize: 10}}>
+                {pagamento[0].dinheiro> 0?<Text style={{fontSize:12}}>Dinheiro: R$ {pagamento[0].dinheiro.toFixed(2).replace('.', ',') + ' '}</Text>: null}
+                {pagamento[0].cartaoDebito> 0 ? <Text style={{fontSize:12}}>Debito: R$ {pagamento[0].cartaoDebito.toFixed(2).replace('.', ',') + ' '}</Text>: null}
+                {pagamento[0].cartaoCredito> 0? <Text style={{fontSize:12}}>Crédito: R$ {pagamento[0].cartaoCredito.toFixed(2).replace('.', ',') + ' '}</Text>: null}
+                {pagamento[0].outros> 0 ?<Text style={{fontSize:12}}>Outros: R$ {pagamento[0].outros.toFixed(2).replace('.', ',') + ' '}</Text>: null}
+                {descontos >0 ?    <Text style={{color: '#757575',fontSize:12  }}>Descontos: R${descontos.toFixed(2).replace('.', ',') + ' '}</Text> : null}
               </View>
-            </Surface>
-          </List.Accordion>
-        </List.AccordionGroup>
+      
 
-      </View>
-    );
+   
+            
+                  <Text style={{ fontSize: 18, color: '#fc6500', fontWeight: 'bold' }}>R$ {total.toFixed(2).replace('.', ',') + ' '}</Text>       
+ 
+     </View>
+               
+              
+    
+       
+
+              <Text style={{ fontSize: 14, color: '#9c9c9c' }}>{stringDate(emissao)}</Text>
+          </Card>
+        )
+      })
+    )
+
+
+  }
+  function onNavigate(route, data) {
+  
+    closeMenu()
+    navigation.navigate(route, {data: data})
+
   }
 
   let offset = 0;
@@ -250,18 +275,20 @@ export default function Dashbard({ navigation }) {
   }
 
   return (
+
     <Surface style={{
       flex: 1,
       flexDirection: 'column',
-      backgroundColor:'#fff'
+      backgroundColor: '#fff'
     }}>
+
       <Surface
         style={{
           height: 150,
           elevation: 2,
           borderBottomLeftRadius: 30,
           borderBottomRightRadius: 30,
-          backgroundColor: '#f8f8f8',
+          backgroundColor: '#fff',
           transform: [{
             translateY: translateY.interpolate({
               inputRange: [-10, 0, 380],
@@ -271,7 +298,19 @@ export default function Dashbard({ navigation }) {
           }]
         }}
       >
-        <BoxRow style={{ flex: 1, alignItems: 'center', marginTop: 0, justifyContent: 'space-between', }}>
+                   <Menu
+                    visible={visible}
+                    onDismiss={closeMenu}
+                   anchor={positionMenu}
+                    >
+                    <Menu.Item icon="open-in-new" onPress={() => onNavigate('DetalheNota', itemMenu)} title="Detalhes" />
+
+                    <Menu.Item icon="google-chrome" onPress={() => {Linking.openURL(itemMenu.url) }} title="Abrir NF-e" />
+                    <Menu.Item icon="delete" onPress={() => showDialogDelete(_id)} title="Deletar" />
+                    <Divider />
+                  </Menu>
+
+        <BoxRow style={{ flex: 1, alignItems: 'center', marginTop: 0, justifyContent: 'space-between'}}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 15, marginTop: 5 }}>
 
             <Submit style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => navigation.navigate('Despensa')}>
@@ -283,30 +322,31 @@ export default function Dashbard({ navigation }) {
             </Submit>
 
           </View>
-          <View color='#000' style={{ flexDirection: 'row', margin: 10, alignItems:'center' }}>
+          <View color='#000' style={{ flexDirection: 'row', margin: 10, alignItems: 'center' }}>
 
             <Text style={{ fontSize: 18, color: '#000' }}>{user ? ` Olá, ${user.first_name != "" ? user.first_name : user.name}` : 'Olá, Visitante'}</Text>
-            {avatarImage == 'photoURL' ?
-            null
-               :
-               <Avatar.Image size={35} source={{uri: avatarImage}} /> 
+            {avatarImage === 'photoURL' ?
+              null
+              :
+              <Avatar.Image size={35} source={{ uri: avatarImage }} />
             }
-  
+
           </View>
         </BoxRow>
       </Surface>
-        <View style={{flexDirection:'column', flex: 1, justifyContent:'space-between'}}>
+      <View style={{ flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
         <Grap translateY={translateY} />
         <TabsBox translateY={translateY} />
         <View></View>
-        </View>
+      </View>
 
 
-      
+
       <PanGestureHandler
         onGestureEvent={animatedEvent}
         onHandlerStateChange={onHandlerStateChange}
       >
+
         <ViewCard style={{
           transform: [{
             translateY: translateY.interpolate({
@@ -326,12 +366,13 @@ export default function Dashbard({ navigation }) {
             </View>
           }
           <MenssagemLength data={{ tamanho: nota.length, message: 'Você não possui lançamentos' }} />
-          <ListF
-            data={nota}
-            style={{ marginTop: 0 }}
-            keyExtractor={item => String(item._id)}
-            renderItem={({ item }) => <ItemNota data={item} />}
-          />
+
+          <View style={{borderRadius: 5, margin: 5, padding: 5}}>
+          {ItemNota(nota)}
+          </View>
+
+         
+
         </ViewCard>
       </PanGestureHandler>
       <FAB.Group
@@ -381,5 +422,6 @@ export default function Dashbard({ navigation }) {
           </Text>
         </Snackbar>}
     </Surface>
+
   );
 }

@@ -3,7 +3,7 @@ import LinearGradiente from 'react-native-linear-gradient';
 import {Animated, StatusBar} from 'react-native';
 
 export const ViewCard = styled(Animated.View)`
-  flex: 6;
+  flex: 1;
   position:absolute;
   background-color:#fff;
   elevation: 3;

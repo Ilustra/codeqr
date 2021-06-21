@@ -43,7 +43,7 @@ export default function Password({ route, navigation }) {
             uid: uid, 
             provider: providerId, 
             token,
-            photoURL: photoURL ? photoURL: '',
+            photoURL: photoURL ? photoURL : '',
             password
           }, 'modified')
         })  
