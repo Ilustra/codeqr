@@ -350,13 +350,7 @@ export default function Notas({ navigation: { navigate } }) {
         </Snackbar>
       </Portal>
 
-      <BannerAd
-      unitId={adUnitId}
-      size={BannerAdSize.FULL_BANNER}
-      requestOptions={{
-        requestNonPersonalizedAdsOnly: true,
-      }}
-    />
+     
     </Surface>
   );
 }

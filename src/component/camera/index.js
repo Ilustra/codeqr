@@ -1,7 +1,7 @@
 import React, {Component, useState, useEffect} from 'react';
 
 import {View, Text, Alert, StyleSheet} from 'react-native';
-import {Snackbar,  ProgressBar, Colors} from 'react-native-paper';
+import {Snackbar,  ProgressBar, FAB, Portal, Dialog, TextInput, Button} from 'react-native-paper';
 import {RNCamera} from 'react-native-camera';
 import {
   Body,
@@ -47,9 +47,10 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
 });
 
 export default function Camera({navigation: {navigate}}) {
-  
+  const onStateChange = () => setOpen(!open);
   const [qrCode, setQrCode] = useState(null);
   const [loaded, setLoaded] = useState(false);
+  const [chaveAcess, setChaveAcess] = useState();
 
   const [isVisibleProgress, setVisibleProgress] = useState(false);
 
@@ -59,7 +60,10 @@ export default function Camera({navigation: {navigate}}) {
   const [messageSnack, setMessageSnack] = useState('');
   const [styleSnack, setStyleSnack] = useState(false)
   const onDismissSnackBar = () => setVisibleSnack(false);
-  
+
+  const [isDialogManual, setIsDialogManual] = useState(false)
+  const hideDialogManual = () => { setIsDialogManual(false) }
+
   function onSnack(status, message, style) {
     setVisibleSnack(status);
     setMessageSnack(message)
@@ -70,7 +74,10 @@ export default function Camera({navigation: {navigate}}) {
 
     }, []);
       
+    function buscarChave(chave){
 
+      console.log(chave);
+    }
   return (
     <Body>
       <Container>
@@ -150,7 +157,7 @@ export default function Camera({navigation: {navigate}}) {
        .then(r=>{
         setQrCode(null)
         onDismissProgress()
-        interstitial.load()
+        /*interstitial.load()
         interstitial.onAdEvent(type=>{
           if(type === AdEventType.LOADED){
               interstitial.show();
@@ -159,7 +166,7 @@ export default function Camera({navigation: {navigate}}) {
             LOADED = false
             onSnack(true, 'Nota registrada com sucesso', true)
           }
-        })
+        })*/
       })
        .catch(e=>{
         setQrCode(null)
@@ -183,12 +190,25 @@ export default function Camera({navigation: {navigate}}) {
     }
     return (
       <>
+
         <RNCamera
           style={styles.preview}
           onGoogleVisionBarcodesDetected={barcodeRecognized}
           autoFocus={RNCamera.Constants.AutoFocus.on}
           flashMode={RNCamera.Constants.FlashMode.off}
         />
+           <FAB.Group
+        style={{  }}
+        visible={true}
+        open={false}
+        color={'#fff'}
+        icon="hand-left"
+        size={40}
+        onStateChange={setIsDialogManual(true)}
+        actions={[]}
+        onPress={() => navigation.navigate('Camera')}
+      />
+
       </>
     );
   }

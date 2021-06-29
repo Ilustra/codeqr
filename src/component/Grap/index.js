@@ -220,9 +220,9 @@ export default function Grap({ translateY }) {
         </Button>
       </View>
 
-      <Subheading style={{ color: '#fc6500', fontWeight: 'bold', textAlign: 'center' }}> R$ {formatarMoeda(onValor(notas))}</Subheading>
+      <Text style={{ color: '#fc6500', fontWeight: 'bold', textAlign: 'center' }}> R$ {formatarMoeda(onValor(notas))}</Text>
       {dataGrap.length ?
-        <View style={{ marginRight: 10, marginLeft: 10 }}>
+        <View style={{ marginRight: 10, marginLeft: 10, marginTop: -10}}>
           <View style={{ height: 200, flexDirection: 'row' }}>
             <YAxis
               data={dataGrap}
@@ -248,25 +248,7 @@ export default function Grap({ translateY }) {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginLeft: 30, marginTop: -15 }}>
             {legendDay(dayGrap)}
           </View>
-          {notas.length > 0 ?
-          <>
-          <Divider/>
-            <List.AccordionGroup>
-              <List.Accordion title="Notas" description={notas.length} id="1">
-                <View style={{height:250 }}>
-                  <ListF
-                    data={notas}
-                    style={{ marginTop: 0 }}
-                    keyExtractor={item => String(item._id)}
-                    renderItem={({ item }) => <ItemNota data={item} />}
-                  />
-                </View>
-              </List.Accordion>
-            </List.AccordionGroup>
-            </>
-            : 
-           null
-            }
+
         </View>
         :
        null

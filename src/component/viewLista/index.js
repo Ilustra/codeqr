@@ -346,8 +346,8 @@ export default function ViewLista({ route, navigation }) {
       })
       .catch(e => {
         onDismissLogInCep()
-        console.log('e', e)
-        onSnack(true, 'Falha ao buscar, por favor verifique se o cep está digitado corretamente', false)
+      //  console.log('e', e)
+      //  onSnack(true, 'Falha ao buscar, por favor verifique se o cep está digitado corretamente', false)
       })
   }
   function listItemMenu(listas){
@@ -375,32 +375,35 @@ export default function ViewLista({ route, navigation }) {
     <Surface style={{ flex: 1,}}>
     <View style={{ flexDirection:'row', justifyContent:'space-between', backgroundColor:'#fc6500'}}>
     <Searchbar
-      style={{backgroundColor:'#fc6500', width:'90%', elevation: 0}}
+      style={{backgroundColor:'#fff', width:'100%', elevation: 0}}
       placeholder="Pesquisar produtos"
       onIconPress={()=>{onChangeSearch}}
       onChangeText={onChangeSearch}
       value={searchQuery}
     />
 
-
-<Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={ <IconButton
-            icon="dots-vertical"
-            size={20}
-            onPress={openMenu}
-          />}>
-          <Menu.Item onPress={() => setIsDialogCep(true)} title="CEP" />
-          
-        </Menu>
    </View>
 
  <ProgressBar progress={0.5}  indeterminate={isProgress} visible={isProgress} />
+    <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+    <Text style={{ marginLeft: 10, color: '#c7c7c7'}}>{region.localidade}/{region.uf}</Text>
+    <Menu
+ 
+ visible={visible}
+ onDismiss={closeMenu}
+ style={{backgroundColor:'#fff'}}
+ anchor={ 
+<IconButton
+   icon="dots-vertical"
+   size={20}
+   onPress={openMenu}
+/>}>
+<Menu.Item onPress={() => setIsDialogCep(true)} title="CEP" />
+</Menu>
+    </View>
 
-   <Text style={{ marginLeft: 10, color: '#c7c7c7'}}>{region.localidade}/{region.uf}</Text>
-          <Surface style={{ backgroundColor: '#fff', flex: 1, margin: 5, borderRadius: 10}}>
-        <View style={{marginBottom: 5}}>
+          <Surface style={{flex: 1, margin: 0, borderRadius: 10}}>
+        <View style={{marginBottom: 0}}>
         <View style={{margin: 5, flexDirection:'row', justifyContent:'space-between', alignItems:'center', padding: 5}}>
           <Title style={{color: '#909090'}}>{lista.nome}</Title>
           <Title style={{fontWeight:'bold', color:'#909090', fontSize: 16}}>R$ {onValor(lista.items).toFixed(2).replace('.', ',')}</Title>

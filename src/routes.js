@@ -138,6 +138,14 @@ export default function Routes() {
           ) : (
             <>
               <RootStack.Screen
+              name="HomeScreen"
+              component={HomeScreen}
+              options={{
+                headerShown: false 
+              }}
+        
+            />        
+              <RootStack.Screen
               name="Dashbard"
               component={Dashbard}
               options={{

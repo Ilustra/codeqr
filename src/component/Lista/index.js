@@ -43,7 +43,7 @@ export default function Lista({ navigation }) {
         const realm = await getRealm();
         const realmObj = realm.objects('Lista')
         const obj = [...realmObj];
-        console.log(obj)
+
         setLista(obj)
       } catch (error) {
         console.log('listas', error)

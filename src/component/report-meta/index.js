@@ -337,7 +337,7 @@ export default function ReportMeta({ navigation }) {
                 </BxDescriptions>
             </View>
    
-            <Surface style={{ marginTop: 10, padding: 2, borderRadius: 10 }}>
+            <Surface style={{ marginTop: 10, padding: 2, borderRadius: 10, flex: 1 }}>
                 <ListF
                     data={dataGrap}
                     keyExtractor={item => String(item._id)}

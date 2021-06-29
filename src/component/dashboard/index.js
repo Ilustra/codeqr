@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Surface, Button, Portal, IconButton, Dialog, Provider, Snackbar, Avatar, Title, ActivityIndicator, Menu, Colors, Divider, Card, List, FAB, Subheading } from 'react-native-paper';
+import { Surface, Button, Portal, IconButton, Dialog, Provider, Snackbar, Avatar, Title, ActivityIndicator, Menu, 
+  Divider, Card, List, FAB, Subheading } from 'react-native-paper';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Text, Animated, View, Image, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -73,17 +74,20 @@ export default function Dashbard({ navigation }) {
   const [inDelete, setInDelete] = useState()
   const [isDialogDelete, setIsdialogDelete] = useState(false)
   const hideDialogDelete = () => { setIsdialogDelete(false) }
-  function showDialogDelete(id) {
+  function showDialogDelete(_id) {
+    setInDelete(_id)
+    setIsdialogDelete(true)
+    /*
     interstitial.load();
     interstitial.onAdEvent(type => {
       if (type === AdEventType.LOADED) {
         interstitial.show();
       }
       if (type === AdEventType.CLOSED) {
-        setInDelete(id)
+        setInDelete(_id)
         setIsdialogDelete(true)
       }
-    })
+    })*/
   }
 
   let LOADED = false
@@ -134,9 +138,7 @@ export default function Dashbard({ navigation }) {
       onSnack(true, 'Ops! algo inesperado aconteceu', false)
     }
   }
-  function onException(response) {
-    onSnack(true, ExpErr(response.status, response.data), false)
-  }
+
   async function _Ondelete(id) {
     setAnimating(true)
     hideDialogDelete()
@@ -183,7 +185,7 @@ export default function Dashbard({ navigation }) {
         return (
           <Card key={key} style={{ elevation: 1, backgroundColor: '#fff', marginLeft: 5, marginRight: 5, marginBottom: 5, borderRadius: 5, padding: 10 }}>
 
-                <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                <View style={{flexDirection:'row', justifyContent:'space-between', }}>
                 <Text style={{ fontSize: 16, color: '#757575' }}>{nome.substr(0, 20)}...</Text>
                 <IconButton
                       style={{margin: -5, padding: -5}}
@@ -226,10 +228,8 @@ export default function Dashbard({ navigation }) {
 
   }
   function onNavigate(route, data) {
-  
     closeMenu()
     navigation.navigate(route, {data: data})
-
   }
 
   let offset = 0;
@@ -306,7 +306,7 @@ export default function Dashbard({ navigation }) {
                     <Menu.Item icon="open-in-new" onPress={() => onNavigate('DetalheNota', itemMenu)} title="Detalhes" />
 
                     <Menu.Item icon="google-chrome" onPress={() => {Linking.openURL(itemMenu.url) }} title="Abrir NF-e" />
-                    <Menu.Item icon="delete" onPress={() => showDialogDelete(_id)} title="Deletar" />
+                    <Menu.Item icon="delete" onPress={() => showDialogDelete(itemMenu._id)} title="Deletar" />
                     <Divider />
                   </Menu>
 
@@ -348,10 +348,11 @@ export default function Dashbard({ navigation }) {
       >
 
         <ViewCard style={{
+          marginTop: 30,
           transform: [{
             translateY: translateY.interpolate({
               inputRange: [-50, 0, 360],
-              outputRange: [-10, 0, 520],
+              outputRange: [-10, 0, 500],
               extrapolate: 'clamp'
             })
           }],
@@ -400,6 +401,7 @@ export default function Dashbard({ navigation }) {
       {statusAuth === 401 ?
         <Snackbar
           visible={visibleSnack}
+          style={styleSnack ? { backgroundColor: '#00C441' } : { backgroundColor: '#f64a4a' }}
           onDismiss={onDismissSnackBar}
           action={{
             label: 'Logar',

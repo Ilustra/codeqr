@@ -9,6 +9,7 @@ export const TabsContainer = styled.ScrollView.attrs({
   })``;
 export const Container = styled(Animated.View)`
   margin-top: 0px;
+  margin-bottom: 0px;
 `;
 //buton - SUBMIT
 export const Submit = styled.TouchableOpacity`

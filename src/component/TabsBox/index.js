@@ -25,10 +25,11 @@ export default function TabsBox({ translateY }) {
 return(
     <Container style={{
       flex: 2,
+       alignItems:'center',
         transform: [{
           translateY: translateY.interpolate({
             inputRange: [0, 380],
-            outputRange: [0, -10],
+            outputRange: [0, -30],
             extrapolate: 'clamp',
           }),
         }],
@@ -37,37 +38,24 @@ return(
           outputRange: [0, 0.9],
           extrapolate: 'clamp',
         }),        
-
       }}>
-              <TabsContainer>
-              <Submit onPress={() => { onNavigate('Despensa') }} >
-                <IconButton color='#fff'  icon='window-open' size={50} style={{ padding: 0, margin: -10 }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Despensa</Text>
-              </Submit>
-              <Submit onPress={() => { onNavigate('Notas') }} >
-                <IconButton color='#fff'  icon='receipt' size={50} style={{ padding: 0, margin: -10 }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Notas</Text>
-              </Submit>
-               
-              <Submit >
-                <IconButton color='#fff' onPress={() => { onNavigate('SerachProducts') }} icon='file-search' size={50} style={{ padding: 0, margin: -10 }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Buscar</Text>
-              </Submit>
-              <Submit onPress={() => { onNavigate('Listas') }}>
-                <IconButton color='#fff'  icon='format-list-checks' size={50} style={{ padding: 0, margin: -10 }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Listas</Text>
-              </Submit>
-              <Submit onPress={() => { onNavigate('Relatorio') }} >
-                <IconButton color='#fff'  icon='chart-line' size={50} style={{ padding: 0, margin: -10 }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Relatorio</Text>
-              </Submit>
-      
-     
-              <Submit onPress={() => { onNavigate('Perfil') }} >
-                <IconButton color='#fff'  icon='account-circle' size={50} style={{ padding: 0, margin: -10, }} />
-                <Text style={{ fontSize: 12, textAlign: 'center', color: '#fff' }}>Perfil</Text>
-              </Submit>
-            </TabsContainer>
+              <Surface style={{      width:250, borderRadius: 10, elevation: 1, backgroundColor:'#fff'}}>
+
+              <Button style={{backgroundColor:'#fff'}} icon="window-open" mode="contained" onPress={() => { onNavigate('Despensa') }}>
+           Despensa
+  </Button>                
+   <Button style={{backgroundColor:'#fff'}} icon="file-search" mode="contained" onPress={() => { onNavigate('SerachProducts') }}>
+              Buscar Produtos
+  </Button>            
+    <Button style={{backgroundColor:'#fff'}} icon="chart-line" mode="contained" onPress={() => { onNavigate('Relatorio') }}>
+    Relatorio
+  </Button>   
+   <Button style={{backgroundColor:'#fff'}} icon="account-circle" mode="contained" onPress={() => { onNavigate('Perfil') }}>
+   Perfil
+  </Button>
+
+
+            </Surface>
 
           </Container>
 

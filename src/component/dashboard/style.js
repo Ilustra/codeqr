@@ -11,7 +11,7 @@ export const ViewCard = styled(Animated.View)`
   height: 80%;
   left:0;
   right:0;
-  top: 120px;
+  top: 90px;
   border-radius: 20px
 `;
 
