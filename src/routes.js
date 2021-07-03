@@ -21,6 +21,7 @@ import ReportMeta from './component/report-meta';
 import Camera from './component/camera';
 import Despensa from './component/Despensa';
 import DespensaView from './component/DespensaView';
+import Lancamento from './component/lancamento';
 import getRealm from './services/realm';
 
 //firebase 
@@ -83,11 +84,11 @@ export default function Routes() {
         if(_user.length){
           await checkAuth()
           .then(r=> {
-            dispatch({ type: 'RESTORE_TOKEN', token: _user[0].token });            
+          dispatch({ type: 'RESTORE_TOKEN', token: _user[0].token });            
           })
           .catch(e=>{
             const {response} = e
-           dispatch({ type: 'SIGN_OUT' });
+        //   dispatch({ type: 'SIGN_OUT' });
           })
         }else{
           dispatch({ type: 'SIGN_OUT' });
@@ -188,6 +189,11 @@ export default function Routes() {
               name="DetalheNota"
               options={{ headerShown: false }}
               component={DetalheNota}
+            />          
+            <RootStack.Screen
+              name="Lancamento"
+              options={{ headerShown: false }}
+              component={Lancamento}
             /> 
              <RootStack.Screen
               name="MonthBalance"

@@ -14,8 +14,8 @@ export default function HomeScreen() {
     <Tab.Navigator
       initialRouteName="Dashbard"
       activeColor="#000"
-      inactiveColor="#fff"
-      barStyle={{ backgroundColor: '#fc6500' }}
+      inactiveColor="#c7c7c7"
+      barStyle={{ backgroundColor: '#fff' }}
     >
       <Tab.Screen
         name="Notas"

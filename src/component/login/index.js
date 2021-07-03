@@ -56,6 +56,11 @@ export default function Login({ navigation }) {
           setEmail(objectUser[0].email)
           setPassword(objectUser[0].password)
         }
+        console.log(objectUser)
+       /* if(){
+          onSingIn(objectUser[0].email, objectUser[0].password)
+        }*/
+
       } catch (error) {
         console.log(error)
       }
