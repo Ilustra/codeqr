@@ -18,3 +18,6 @@ export const TxYear =styled.Text`
 export const TxMonth =styled.Text`
   font-size: 14px;
 `;
+export const Txt = styled.Text`
+
+`;

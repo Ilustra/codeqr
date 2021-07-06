@@ -52,7 +52,10 @@ export default function SerachProducts() {
         .then(async r => {
           const { localidade, cep } = r.data
           if (r.data) {
+ 
             const aux_cep = await onCEP(cep)
+
+            if(aux_cep)
             setRegion(aux_cep);
           }
         })

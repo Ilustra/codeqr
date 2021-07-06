@@ -45,7 +45,7 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
   keywords: ['fashion', 'clothing'],
 });
-
+import QRCodeScanner from 'react-native-qrcode-scanner';
 export default function Camera({navigation: {navigate}}) {
   const onStateChange = () => setOpen(!open);
   const [qrCode, setQrCode] = useState(null);
@@ -124,7 +124,12 @@ export default function Camera({navigation: {navigate}}) {
           <BoxScanBotton />
 
         </BoxTexte>
-
+        <BoxInfo>
+          <Text style={{fontSize: 14, textAlign: 'center', color:'#00C441'}}>
+            Mantenha a câmera parada fixada sobre o código qr.
+          </Text>
+      
+        </BoxInfo>
       </Container>
       <Snackbar
         visible={visibleSnack}
@@ -179,36 +184,30 @@ export default function Camera({navigation: {navigate}}) {
 
 
     async function barcodeRecognized({barcodes}) {
-      const string = 'http://www.fazenda.pr.gov.br/';
+      console.log(barcodes)
+     /* const string = 'http://www.fazenda.pr.gov.br/';
       const lastString = barcodes[0].data.substring(0, string.length);
       if (!qrCode) {
         if (string == lastString) {
           setQrCode(barcodes);
           await handledAddRepository(barcodes[0].data);
         }
-      }
+      }*/
     }
+
+    async function onSuccess (e){
+
+      navigate("Process", {url: e.data});
+    //  await handledAddRepository(e.data);
+    };
     return (
       <>
+      <QRCodeScanner
+        onRead={onSuccess}
+        flashMode={RNCamera.Constants.FlashMode.auto}
 
-        <RNCamera
-          style={styles.preview}
-          onGoogleVisionBarcodesDetected={barcodeRecognized}
-          autoFocus={RNCamera.Constants.AutoFocus.on}
-          flashMode={RNCamera.Constants.FlashMode.off}
-        />
-           <FAB.Group
-        style={{  }}
-        visible={true}
-        open={false}
-        color={'#fff'}
-        icon="hand-left"
-        size={40}
-        onStateChange={setIsDialogManual(true)}
-        actions={[]}
-        onPress={() => navigation.navigate('Camera')}
+
       />
-
       </>
     );
   }

@@ -47,9 +47,7 @@ return(
    <Button style={{backgroundColor:'#fff'}} icon="file-search" mode="contained" onPress={() => { onNavigate('SerachProducts') }}>
               Buscar Produtos
   </Button>            
-    <Button style={{backgroundColor:'#fff'}} icon="chart-line" mode="contained" onPress={() => { onNavigate('Relatorio') }}>
-    Relatorio
-  </Button>   
+ 
    <Button style={{backgroundColor:'#fff'}} icon="account-circle" mode="contained" onPress={() => { onNavigate('Perfil') }}>
    Perfil
   </Button>

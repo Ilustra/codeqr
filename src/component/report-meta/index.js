@@ -1,15 +1,16 @@
 import React, { Component, useEffect, useState } from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TextInput, Button, Surface, List, ActivityIndicator, Colors, Divider, Title, Portal, ProgressBar, Snackbar, Subheading } from 'react-native-paper';
 //
-import { ListF, BxDescriptions, TxYear } from './style';
+import { ListF, BxDescriptions, TxYear, Txt } from './style';
 //
 import { getNotasMonth } from '../../Controller/ControllerNotas'
 import { getBallance } from '../../Controller/controller-ballance'
 import { stringDate } from '../bibliotecas_functions';
 import getRealm from '../../services/realm';
 //
+import {formatarMoeda} from '../bibliotecas_functions'
 import { ExpErr } from '../expecptions'
 import MenssagemLength from '../MenssagemLength'
 const MONTH = [
@@ -27,18 +28,19 @@ const MONTH = [
     { id: 11, mes: 'Dezembro', sig: 'DEZ' },
 ];
 //
-import { LineChart, YAxis, XAxis, Grid } from 'react-native-svg-charts'
+import { LineChart, YAxis, XAxis, Grid, PieChart } from 'react-native-svg-charts'
+import{Text} from 'react-native-svg';
 import * as scale from 'd3-scale'
 import * as shape from 'd3-shape'
 
-
-//
 export default function ReportMeta({ navigation }) {
+    const [stores, setStores] = useState([0,0,0,0,0])
     const contentInset = { top: 20, bottom: 20 }
     const [now, setNow] = useState(new Date())
     const [dataGrap, setDataGrap] = useState([])
     const [ballance, setBallance] = useState({ notas: 0, itens: 0, tributos: 0, total: 0 })
 
+    const [notas, setNotas] = useState([]);
     //snack
     const [visibleSnack, setVisibleSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('message');
@@ -53,14 +55,13 @@ export default function ReportMeta({ navigation }) {
     const [animating, setAnimating] = useState(false)
     const onDismissIndicator = () => setAnimating(false);
     //
-    const data = [750, 230]
+
 
     useEffect(() => {
         async function reloagGet() {
             try {
                 const realm = await getRealm();
                 const _user = realm.objects('User')
-
                 const start = new Date(1, 1, now.getFullYear())
                 const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
                 getNotas(_user[0]._id, start, end)
@@ -73,12 +74,37 @@ export default function ReportMeta({ navigation }) {
         }
         reloagGet();
     }, []);
+
+    
+    function separaNota(aux_value){
+    let aux = [];
+    let ts = notas;
+    aux_value.forEach(res=>{
+        const filterT = aux.filter(element=>{
+            if(element.cnpj == res.cnpj)
+            return element;
+        })
+        if(filterT.length){
+            const newT ={
+                nome: filterT[0].nome,
+                cnpj: filterT[0].cnpj,
+                total: filterT[0].total += res.total,
+            }
+            aux = aux.map(e => e.cnpj == newT.cnpj ? newT : e);
+        }else{
+            aux.push({nome: res.nome, cnpj: res.cnpj, total: res.total})
+        }
+    })
+    setStores(aux);
+    console.log(aux)
+ 
+}
     async function getNotas(id, startTime, endTime) {
         setAnimating(true)
+   
         await getNotasMonth(id, startTime, endTime)
             .then(element => {
                 const { data } = element
-
                 const now = new Date();
                 let balanco =
                 {
@@ -153,14 +179,16 @@ export default function ReportMeta({ navigation }) {
                         tributos: 0
                     }
                 ]
-                data.forEach(element => {
-                    balanco.notas += 1
-                    balanco.itens += element.itens
-                    balanco.total += element.total
-                    balanco.tributos += element.tributos
 
-                    const date = new Date(element.emissao)
-                    console.log(date)
+
+                data.forEach(element => {
+                    balanco.notas += 1;
+                    balanco.itens += element.itens;
+                    balanco.total += element.total;
+                    balanco.tributos += element.tributos;
+                    
+                    const date = new Date(element.emissao);
+
                     switch (date.getMonth()) {
                         case 0: {
                             listMonth[0].total += element.total
@@ -221,8 +249,9 @@ export default function ReportMeta({ navigation }) {
 
                 setBallance(balanco)
                 onDismissIndicator()
-                console.log(listMonth)
                 setDataGrap(listMonth)
+                setNotas(data);
+                separaNota(data);
             })
             .catch(e => {
                 onDismissIndicator()
@@ -231,62 +260,111 @@ export default function ReportMeta({ navigation }) {
                 onSnack(true, ExpErr(response.status, response.data), false)
             })
     }
-    function formatarMoeda(valor) {
-        valor = valor + '';
-        valor = parseInt(valor.replace(/[\D]+/g, ''));
-        valor = valor + '';
-        valor = valor.replace(/([0-9]{2})$/g, ",$1");
-
-        if (valor.length > 6) {
-            valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
-        }
-
-        return valor;
-    }
 
 
 
-    function ItemMonths({ data }) {
-        if (data.total > 0) {
-            return (
-                <Surface style={{ backgroundColor: '#fff', margin: 2, borderRadius: 5, elevation: 3, padding: 5 }}>
-                    <View style={{ borderRadius: 5, backgroundColor: '#fff', marginLeft: 10, marginRight: 10 }}>
-                        <BxDescriptions style={{ alignItems: 'center', paddingRight: 5, paddingLeft: 5 }}>
-                            <Subheading style={{ fontWeight: 'bold', color: '#909090', fontSize:18 }}>{MONTH[data.month].mes}</Subheading>
-                            <Subheading style={{ color: '#909090', fontWeight:'bold', fontSize:18 }}> R$ {formatarMoeda(data.total.toFixed(2))}</Subheading>
-                        </BxDescriptions>
-                        <BxDescriptions style={{ marginLeft: 15, marginRight: 15 }}>
-                            <Text style={{ color: '#909090', fontSize: 12 }}>Tributos R$ {data.tributos.toFixed(2).replace('.', ',')}</Text>
-                        </BxDescriptions>
 
-                    </View>
-                </Surface>
-            )
-        } else {
-            return (
-                null
-            )
-        }
-
+    function ItemMonths( data ) {
+        return data.map((element, key)=>{
+            if (element.total > 0) {
+                return(
+                
+                    <Surface key={key} style={{ backgroundColor: '#fff', margin: 2, borderRadius: 5, elevation: 3, padding: 5 }}>
+                        <View style={{ borderRadius: 5, backgroundColor: '#fff', marginLeft: 10, marginRight: 10 }}>
+                            <BxDescriptions style={{ alignItems: 'center', paddingRight: 5, paddingLeft: 5 }}>
+                                <Subheading style={{ fontWeight: 'bold', color: '#909090', fontSize:18 }}>{MONTH[element.month].mes}</Subheading>
+                                <Subheading style={{ color: '#909090', fontWeight:'bold', fontSize:18 }}> R$ {formatarMoeda(element.total.toFixed(2))}</Subheading>
+                            </BxDescriptions>
+                            <BxDescriptions style={{ marginLeft: 15, marginRight: 15 }}>
+                                <Txt style={{ color: '#909090', fontSize: 12 }}>Tributos R$ {element.tributos.toFixed(2).replace('.', ',')}</Txt>
+                            </BxDescriptions>
+    
+                        </View>
+                    </Surface>
+                )
+            } else{
+                return (
+                    null
+                )
+            }
+   
+        });
     }
     function listDescription(data) {
         return (
             data.map((elem, key) => {
                 return (
                     <View key={key}>
-                        <Text style={{ fontSize: 8 }}>{MONTH[elem.month].sig}</Text>
+                        <Txt style={{ fontSize: 8 }}>{MONTH[elem.month].sig}</Txt>
                     </View>
                 )
             }
             )
         )
     }
+    const data = stores
+    const [store, setStore] = useState()
+    const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7)
+
+        const Label = ({slices})=> {
+    
+            return slices.map((slice, key)=>{
+                const{data, pieCentroid} = slice
+                console.log(data)
+                return(
+
+        
+         <Text
+                    key={key}
+                    x={pieCentroid[0]}
+                    y={pieCentroid[1]}
+                    fill='black'
+                    textAnchor={'middle'}
+                    alignmentBaseLine={'midle'}
+                    fontSize={12}
+                    > {((data.value*100)/ballance.total).toFixed(2)}%</Text>
+     
+       ) 
+            })
+        }
 
 
+    const pieData = data
+       
+    .map((element, key)=>(
+        {
+        value: element.total,
+        svg: {
+            fill: randomColor(),
+            onPress: () => setStore(element),
+        },
+        key: `pie-${key}`,
+    }))
+    function listStores(){
+        return stores.map((element, key)=>
+   {         return(
+                <Surface key={key} style={{margin: 5, elevation: 1, backgroundColor:'#fff', borderRadius: 10, padding: 10 }}>
+                    <TxYear>{element.nome}</TxYear>
+                    <TxYear>R$ {formatarMoeda(parseFloat(element.total).toFixed(2))}</TxYear>
+                </Surface>
+            )}
+        )
+    }
     return (
-        <Surface style={{ flex: 1, backgroundColor: '#fff' }}>
+        <Surface style={{ flex: 1, }}>
+                     <ActivityIndicator animating={animating} />   
+            <ScrollView>
+                    <View style={{flex:1, justifyContent:'center'}}>
+                <PieChart style={{ height: 250 }} data={pieData}>
+                <Label />
+            </PieChart>
+                </View>
+        
+
+            {stores ?listStores() : null}
+
                 <Surface style={{  borderRadius: 5,  }} >
-                    <Surface style={{ elevation: 1, backgroundColor: '#fff', borderRadius: 5, padding: 3 }}>
+                    <Surface style={{ margin: 10, elevation: 1, backgroundColor:'#fff', borderRadius: 10, padding: 10 }}>
                         <BxDescriptions>
                             <TxYear>Notas:</TxYear>
                             <TxYear>{ballance.notas}</TxYear>
@@ -308,7 +386,9 @@ export default function ReportMeta({ navigation }) {
                         </BxDescriptions>
                     </Surface>
                 </Surface>
-            <ActivityIndicator animating={animating} />
+
+
+
             <View>
                 <View style={{ height: 200, flexDirection: 'row' }}>
                     <YAxis
@@ -338,11 +418,8 @@ export default function ReportMeta({ navigation }) {
             </View>
    
             <Surface style={{ marginTop: 10, padding: 2, borderRadius: 10, flex: 1 }}>
-                <ListF
-                    data={dataGrap}
-                    keyExtractor={item => String(item._id)}
-                    renderItem={({ item }) => <ItemMonths data={item} />}
-                />
+    
+                {ItemMonths(dataGrap)}
             </Surface>
 
             <Snackbar
@@ -353,11 +430,11 @@ export default function ReportMeta({ navigation }) {
                     label: 'Sair',
                     onPress: () => { onDismissSnackBar() }
                 }}>
-                <Text style={{ color: '#fff', textAlign: 'center' }}>
+                <Txt style={{ color: '#fff', textAlign: 'center' }}>
                     {messageSnack}
-                </Text>
+                </Txt>
             </Snackbar>
-
+            </ScrollView>
         </Surface>
     )
 }

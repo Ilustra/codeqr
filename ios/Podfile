@@ -38,6 +38,8 @@ target 'appqrcode' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
   target 'appqrcodeTests' do
     inherit! :search_paths
     # Pods for testing

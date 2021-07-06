@@ -385,7 +385,7 @@ export default function Dashbard({ navigation }) {
         size={40}
         onStateChange={onStateChange}
         actions={[]}
-        onPress={() => navigation.navigate('Lancamento')}
+        onPress={() => navigation.navigate('Camera')}
       />
       <Portal>
         <Dialog visible={isDialogDelete} onDismiss={hideDialogDelete}>

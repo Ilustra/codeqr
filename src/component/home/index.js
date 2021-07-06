@@ -4,7 +4,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Dashbard from '../dashboard';
 import Listas from '../Lista';
 import Notas from '../notas';
-import Despensa from '../Despensa';
+import ReportMeta from '../report-meta';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -15,7 +15,7 @@ export default function HomeScreen() {
       initialRouteName="Dashbard"
       activeColor="#000"
       inactiveColor="#c7c7c7"
-      barStyle={{ backgroundColor: '#fff' }}
+      barStyle={{ }}
     >
       <Tab.Screen
         name="Notas"
@@ -45,6 +45,16 @@ export default function HomeScreen() {
           tabBarLabel: 'Listas',
           tabBarIcon: ({ color }) => (
             <Icon name="reorder" color={color} size={26} />
+          ),
+        }}
+      />      
+        <Tab.Screen
+        name="ReportMeta"
+        component={ReportMeta}
+        options={{
+          tabBarLabel: 'Relatório',
+          tabBarIcon: ({ color }) => (
+            <Icon name="trending-up" color={color} size={26} />
           ),
         }}
       /> 

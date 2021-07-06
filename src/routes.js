@@ -21,7 +21,7 @@ import ReportMeta from './component/report-meta';
 import Camera from './component/camera';
 import Despensa from './component/Despensa';
 import DespensaView from './component/DespensaView';
-import Lancamento from './component/lancamento';
+import Process from './component/process';
 import getRealm from './services/realm';
 
 //firebase 
@@ -164,6 +164,14 @@ export default function Routes() {
               <RootStack.Screen
               name="Notas"
               component={Notas}
+            />        
+              <RootStack.Screen
+              name="Process"
+              component={Process}
+              options={{
+                headerShown: false,
+
+              }}
             />
             <RootStack.Screen
               name="SerachProducts"
@@ -190,11 +198,7 @@ export default function Routes() {
               options={{ headerShown: false }}
               component={DetalheNota}
             />          
-            <RootStack.Screen
-              name="Lancamento"
-              options={{ headerShown: false }}
-              component={Lancamento}
-            /> 
+
              <RootStack.Screen
               name="MonthBalance"
               options={{ headerShown: false }}

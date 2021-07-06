@@ -151,13 +151,10 @@ export default function Grap({ translateY }) {
     await getNotasMonth(id, startTime, endTime)
       .then(element => {
         const { data } = element
-
         const list = []
         let _listDay = []
-
         setNotas(data)
         let i = 1
-
         data.forEach(e => {
           let day = new Date(e.emissao)
           list.unshift(e.total)
