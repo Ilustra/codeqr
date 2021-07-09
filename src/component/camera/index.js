@@ -46,7 +46,7 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: ['fashion', 'clothing'],
 });
 import QRCodeScanner from 'react-native-qrcode-scanner';
-export default function Camera({navigation: {navigate}}) {
+export default function Camera({navigation}) {
   const onStateChange = () => setOpen(!open);
   const [qrCode, setQrCode] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -162,8 +162,9 @@ export default function Camera({navigation: {navigate}}) {
        .then(r=>{
         setQrCode(null)
         onDismissProgress()
-        /*interstitial.load()
+        interstitial.load()
         interstitial.onAdEvent(type=>{
+          console.log('type', type)
           if(type === AdEventType.LOADED){
               interstitial.show();
           }
@@ -171,7 +172,7 @@ export default function Camera({navigation: {navigate}}) {
             LOADED = false
             onSnack(true, 'Nota registrada com sucesso', true)
           }
-        })*/
+        })
       })
        .catch(e=>{
         setQrCode(null)
@@ -196,17 +197,16 @@ export default function Camera({navigation: {navigate}}) {
     }
 
     async function onSuccess (e){
-
-      navigate("Process", {url: e.data});
-    //  await handledAddRepository(e.data);
+      
+      navigation.navigate("Process", {url: e.data});
+   //  await handledAddRepository(e.data);
     };
+
     return (
       <>
       <QRCodeScanner
         onRead={onSuccess}
         flashMode={RNCamera.Constants.FlashMode.auto}
-
-
       />
       </>
     );

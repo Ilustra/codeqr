@@ -1,11 +1,11 @@
-import React, {Component, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {StatusBar, View, Text} from 'react-native';
+import {View, Text} from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {ExpErr} from '../expecptions'
-import { Surface, Button, IconButton, Title, Divider, Subheading,ActivityIndicator,Snackbar } from 'react-native-paper';
-import { useState } from 'react/cjs/react.development';
+
+import { Surface, Button,  ActivityIndicator,Snackbar } from 'react-native-paper';
+
 import { RegisterNota } from '../../Controller/ControllerNotas';
 //importar o serviço do realm para poder salvar
 import getRealm from '../../services/realm';
@@ -21,56 +21,60 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
   keywords: ['fashion', 'clothing'],
 });
-
+import {ExpErr} from '../expecptions'
 export default function Process({route, navigation}) {
+  const {url} = route.params
   const [nota, setNota] = useState()
   const [animating, setAnimating] = useState(false)
   const [title, setTitle] = useState('')
-  const [subtitle, setSubtitle] = useState('processando nota')
-  const [headeMessage, setHeaderMessage] = useState('um anuncio tela interia será exibido e sua nota será registrada')
- 
-       //snack
-       const [visibleSnack, setVisibleSnack] = useState(false);
-       const [messageSnack, setMessageSnack] = useState('');
-       const [styleSnack, setStyleSnack] = useState(false)
-       const onDismissSnackBar = () => setVisibleSnack(false);
+
+   //snack
+  const [visibleSnack, setVisibleSnack] = useState(false);
+  const [messageSnack, setMessageSnack] = useState('');
+  const [styleSnack, setStyleSnack] = useState(false)
+  const onDismissSnackBar = () => setVisibleSnack(false);
 
   useEffect(() => {
-    const url = route.params
-    console.log(url)
-    setAnimating(true);
-    setTitle('Aguarde...')
-    t(url.url);
-    
-  }, []);
-  async function t (url){
-    const realm = await getRealm();
-    const _user = realm.objects('User');
-    const id = _user[0]._id
-    await RegisterNota(url, id)
-    .then(r=>{
-     setTitle('Processando, aguarde o anúncio para o registro da nota!')
-     setTimeout(() => {
-    interstitial.load()
-    interstitial.onAdEvent(type=>{
-       if(type === AdEventType.LOADED){
-           interstitial.show();
-       }
-       if(type ===AdEventType.CLOSED){
-        setAnimating(false);
-        setNota(r.data)
-         setTitle('Nota registrada com sucesso')
-       }
-     })
-     }, 1200);
-   })
-    .catch(e=>{
-      setAnimating(false);
-      const {response} = e
-      onSnack(true, ExpErr(response.status, response.data), false)
-      setTitle(ExpErr(response.status, response.data))
-    });
+    async function handledAddRepository(data) {
+      setAnimating(true)
+      const realm = await getRealm();
+      const _user = realm.objects('User');
+      const id = _user[0]._id
+     await RegisterNota(data, id)
+     .then(r=>{
+      setNota(r.data);
+      interstitial.load()
+      interstitial.onAdEvent(type=>{
+
+        if(type === AdEventType.LOADED){
+            interstitial.show();
+        }
+        if(type ===AdEventType.CLOSED){
+
+          setAnimating(false)
+          onSnack(true, 'Nota registrada com sucesso', true);
+          setTitle('Nota registrada com sucesso');
+        }
+        if(type=== 'error'){
+          setAnimating(false)
+          setTitle('Nota registrada com sucesso');
+          onSnack(true, 'Nota registrada com sucesso', true)
+        }
+      })
+    })
+     .catch(e=>{
+
+       const {response} = e
+       onSnack(true, ExpErr(response.status, response.data), false)
+       setAnimating(false)
+       setTitle(ExpErr(response.status, response.data))
+       //onDismissProgress()
+     });
+     
   }
+  handledAddRepository(url)
+  }, []);
+
   function onSnack(status, message, style) {
     setVisibleSnack(status);
     setMessageSnack(message)
@@ -91,8 +95,8 @@ export default function Process({route, navigation}) {
           <Text style={{fontSize:22, textAlign:'center', margin: 10}}>{title}</Text>
           {!animating ? 
                  <View>
-                 <Button mode='outlined' onPress={()=> navigation.navigate('HomeScreen')}>Voltar ao Home</Button>
-                 <Button mode='outlined' onPress={()=> navigation.navigate('Camera')}>Escanear outra nota</Button>
+                 <Button mode='outlined' onPress={()=> navigation.navigate('HomeScreen')}>Voltar ao inicio</Button>
+
                </View>:
                null}
    
@@ -107,13 +111,18 @@ export default function Process({route, navigation}) {
         }}>
         {messageSnack}
       </Snackbar>
-      <BannerAd
-      unitId={BannerId}
-      size={BannerAdSize.FULL_BANNER}
-      requestOptions={{
-        requestNonPersonalizedAdsOnly: true,
-      }}
-    />
+ 
+    <View style={{justifyContent:'center', alignItems:'center', marginTop: -100, marginBottom: 100}}>
+    <BannerAd
+    unitId={BannerId}
+    size={BannerAdSize.MEDIUM_RECTANGLE}
+    requestOptions={{
+      requestNonPersonalizedAdsOnly: true,
+    }}
+  />
+    </View>
+
+    
         </Surface>
     )
 }

@@ -10,7 +10,7 @@ import { getBallance } from '../../Controller/controller-ballance'
 import { stringDate } from '../bibliotecas_functions';
 import getRealm from '../../services/realm';
 //
-import {formatarMoeda} from '../bibliotecas_functions'
+import { formatarMoeda } from '../bibliotecas_functions'
 import { ExpErr } from '../expecptions'
 import MenssagemLength from '../MenssagemLength'
 const MONTH = [
@@ -29,12 +29,22 @@ const MONTH = [
 ];
 //
 import { LineChart, YAxis, XAxis, Grid, PieChart } from 'react-native-svg-charts'
-import{Text} from 'react-native-svg';
+import { Text } from 'react-native-svg';
 import * as scale from 'd3-scale'
 import * as shape from 'd3-shape'
+import { InterstitialAd, AdEventType } from '@react-native-firebase/admob';
+import { IDBanner, IDintersiial } from '../variaveis'
+const adUnitId = IDBanner;
+import { BannerAd, BannerAdSize } from '@react-native-firebase/admob';
+
+const interstitial = InterstitialAd.createForAdRequest(IDintersiial, {
+    requestNonPersonalizedAdsOnly: true,
+    keywords: ['fashion', 'clothing'],
+});
+
 
 export default function ReportMeta({ navigation }) {
-    const [stores, setStores] = useState([0,0,0,0,0])
+    const [stores, setStores] = useState([0,0,0,0])
     const contentInset = { top: 20, bottom: 20 }
     const [now, setNow] = useState(new Date())
     const [dataGrap, setDataGrap] = useState([])
@@ -67,7 +77,7 @@ export default function ReportMeta({ navigation }) {
                 getNotas(_user[0]._id, start, end)
 
             } catch (error) {
-                const {response} = error
+                const { response } = error
                 console.log('error', error)
                 onSnack(true, ExpErr(response.status, response.data), false)
             }
@@ -75,33 +85,32 @@ export default function ReportMeta({ navigation }) {
         reloagGet();
     }, []);
 
-    
-    function separaNota(aux_value){
-    let aux = [];
-    let ts = notas;
-    aux_value.forEach(res=>{
-        const filterT = aux.filter(element=>{
-            if(element.cnpj == res.cnpj)
-            return element;
-        })
-        if(filterT.length){
-            const newT ={
-                nome: filterT[0].nome,
-                cnpj: filterT[0].cnpj,
-                total: filterT[0].total += res.total,
+
+    function separaNota(aux_value) {
+        let aux = [];
+        let ts = notas;
+        aux_value.forEach(res => {
+            const filterT = aux.filter(element => {
+                if (element.cnpj == res.cnpj)
+                    return element;
+            })
+            if (filterT.length) {
+                const newT = {
+                    nome: filterT[0].nome,
+                    cnpj: filterT[0].cnpj,
+                    total: filterT[0].total += res.total,
+                }
+                aux = aux.map(e => e.cnpj == newT.cnpj ? newT : e);
+            } else {
+                aux.push({ nome: res.nome, cnpj: res.cnpj, total: res.total })
             }
-            aux = aux.map(e => e.cnpj == newT.cnpj ? newT : e);
-        }else{
-            aux.push({nome: res.nome, cnpj: res.cnpj, total: res.total})
-        }
-    })
-    setStores(aux);
-    console.log(aux)
- 
-}
+        })
+        setStores(aux);
+        console.log(aux)
+    }
+
     async function getNotas(id, startTime, endTime) {
         setAnimating(true)
-   
         await getNotasMonth(id, startTime, endTime)
             .then(element => {
                 const { data } = element
@@ -186,7 +195,7 @@ export default function ReportMeta({ navigation }) {
                     balanco.itens += element.itens;
                     balanco.total += element.total;
                     balanco.tributos += element.tributos;
-                    
+
                     const date = new Date(element.emissao);
 
                     switch (date.getMonth()) {
@@ -246,7 +255,6 @@ export default function ReportMeta({ navigation }) {
                             break;
                     }
                 })
-
                 setBallance(balanco)
                 onDismissIndicator()
                 setDataGrap(listMonth)
@@ -261,35 +269,33 @@ export default function ReportMeta({ navigation }) {
             })
     }
 
-
-
-
-    function ItemMonths( data ) {
-        return data.map((element, key)=>{
+    function ItemMonths(data) {
+        return data.map((element, key) => {
             if (element.total > 0) {
-                return(
-                
+                return (
+
                     <Surface key={key} style={{ backgroundColor: '#fff', margin: 2, borderRadius: 5, elevation: 3, padding: 5 }}>
                         <View style={{ borderRadius: 5, backgroundColor: '#fff', marginLeft: 10, marginRight: 10 }}>
                             <BxDescriptions style={{ alignItems: 'center', paddingRight: 5, paddingLeft: 5 }}>
-                                <Subheading style={{ fontWeight: 'bold', color: '#909090', fontSize:18 }}>{MONTH[element.month].mes}</Subheading>
-                                <Subheading style={{ color: '#909090', fontWeight:'bold', fontSize:18 }}> R$ {formatarMoeda(element.total.toFixed(2))}</Subheading>
+                                <Subheading style={{ fontWeight: 'bold', color: '#909090', fontSize: 18 }}>{MONTH[element.month].mes}</Subheading>
+                                <Subheading style={{ color: '#909090', fontWeight: 'bold', fontSize: 18 }}> R$ {formatarMoeda(element.total.toFixed(2))}</Subheading>
                             </BxDescriptions>
                             <BxDescriptions style={{ marginLeft: 15, marginRight: 15 }}>
                                 <Txt style={{ color: '#909090', fontSize: 12 }}>Tributos R$ {element.tributos.toFixed(2).replace('.', ',')}</Txt>
                             </BxDescriptions>
-    
+
                         </View>
                     </Surface>
                 )
-            } else{
+            } else {
                 return (
                     null
                 )
             }
-   
+
         });
     }
+
     function listDescription(data) {
         return (
             data.map((elem, key) => {
@@ -302,19 +308,17 @@ export default function ReportMeta({ navigation }) {
             )
         )
     }
+
     const data = stores
     const [store, setStore] = useState()
     const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7)
 
-        const Label = ({slices})=> {
-    
-            return slices.map((slice, key)=>{
-                const{data, pieCentroid} = slice
-                console.log(data)
-                return(
-
-        
-         <Text
+    const Label = ({ slices }) => {
+        return slices.map((slice, key) => {
+            const { data, pieCentroid } = slice
+            console.log(data)
+            return (
+                <Text
                     key={key}
                     x={pieCentroid[0]}
                     y={pieCentroid[1]}
@@ -322,49 +326,62 @@ export default function ReportMeta({ navigation }) {
                     textAnchor={'middle'}
                     alignmentBaseLine={'midle'}
                     fontSize={12}
-                    > {((data.value*100)/ballance.total).toFixed(2)}%</Text>
-     
-       ) 
-            })
-        }
+                > {((data.value * 100) / ballance.total).toFixed(2)}%</Text>
 
+            )
+        })
+    }
 
     const pieData = data
-       
-    .map((element, key)=>(
-        {
-        value: element.total,
-        svg: {
-            fill: randomColor(),
-            onPress: () => setStore(element),
-        },
-        key: `pie-${key}`,
-    }))
-    function listStores(){
-        return stores.map((element, key)=>
-   {         return(
-                <Surface key={key} style={{margin: 5, elevation: 1, backgroundColor:'#fff', borderRadius: 10, padding: 10 }}>
-                    <TxYear>{element.nome}</TxYear>
-                    <TxYear>R$ {formatarMoeda(parseFloat(element.total).toFixed(2))}</TxYear>
-                </Surface>
-            )}
+        .map((element, key) => (
+            {
+                value: element.total,
+                svg: {
+                    fill: randomColor(),
+                    onPress: () => setStore(element),
+                },
+                key: `pie-${key}`,
+            }))
+    function listStores() {
+        return stores.map((element, key) => {
+            if(element.total> 0){
+                return (
+                    <Surface key={key} style={{ margin: 5, elevation: 1, backgroundColor: '#fff', borderRadius: 10, padding: 10 }}>
+                        <TxYear>{element.nome}</TxYear>
+                        <TxYear>R$ {formatarMoeda(parseFloat(element.total).toFixed(2))}</TxYear>
+                    </Surface>
+                )
+            }
+            else
+            return null
+        }
         )
     }
     return (
         <Surface style={{ flex: 1, }}>
-                     <ActivityIndicator animating={animating} />   
+            <ActivityIndicator animating={animating} />
             <ScrollView>
-                    <View style={{flex:1, justifyContent:'center'}}>
-                <PieChart style={{ height: 250 }} data={pieData}>
-                <Label />
-            </PieChart>
-                </View>
-        
-
-            {stores ?listStores() : null}
-
-                <Surface style={{  borderRadius: 5,  }} >
-                    <Surface style={{ margin: 10, elevation: 1, backgroundColor:'#fff', borderRadius: 10, padding: 10 }}>
+                {stores.length>0 ?
+                    <>
+                        <View style={{ flex: 1, justifyContent: 'center' }}>
+                            <PieChart style={{ height: 250 }} data={pieData}>
+                                <Label />
+                            </PieChart>
+                        </View>
+                        <View style={{marginTop: 10, marginBottom: 10}}>
+                        <BannerAd
+                            unitId={adUnitId}
+                            size={BannerAdSize.FULL_BANNER}
+                            requestOptions={{
+                                requestNonPersonalizedAdsOnly: true,
+                            }}
+                        />
+                        </View>
+                        {listStores()}
+                    </>
+                    : null}
+                <Surface style={{ borderRadius: 5, }} >
+                    <Surface style={{ margin: 10, elevation: 1, backgroundColor: '#fff', borderRadius: 10, padding: 10 }}>
                         <BxDescriptions>
                             <TxYear>Notas:</TxYear>
                             <TxYear>{ballance.notas}</TxYear>
@@ -386,54 +403,48 @@ export default function ReportMeta({ navigation }) {
                         </BxDescriptions>
                     </Surface>
                 </Surface>
-
-
-
-            <View>
-                <View style={{ height: 200, flexDirection: 'row' }}>
-                    <YAxis
-                        data={dataGrap}
-                        contentInset={contentInset}
-                        svg={{
-                            fill: 'grey',
-                            fontSize: 10,
-                        }}
-                        numberOfTicks={10}
-                        yAccessor={({ item }) => item.total}
-                        formatLabel={(valor, month) => `R$ ${valor}`}
-                    />
-                    <LineChart
-                        style={{ flex: 1, marginLeft: 16 }}
-                        data={dataGrap}
-                        yAccessor={({ item }) => item.total}
-                        svg={{ stroke: '#fc6500' }}
-                        contentInset={contentInset}
-                    >
-                    <Grid />
-                    </LineChart>
+                <View>
+                    <View style={{ height: 200, flexDirection: 'row' }}>
+                        <YAxis
+                            data={dataGrap}
+                            contentInset={contentInset}
+                            svg={{
+                                fill: 'grey',
+                                fontSize: 10,
+                            }}
+                            numberOfTicks={10}
+                            yAccessor={({ item }) => item.total}
+                            formatLabel={(valor, month) => `R$ ${valor}`}
+                        />
+                        <LineChart
+                            style={{ flex: 1, marginLeft: 16 }}
+                            data={dataGrap}
+                            yAccessor={({ item }) => item.total}
+                            svg={{ stroke: '#fc6500' }}
+                            contentInset={contentInset}
+                        >
+                            <Grid />
+                        </LineChart>
+                    </View>
+                    <BxDescriptions style={{ marginLeft: 40 }}>
+                        {listDescription(dataGrap)}
+                    </BxDescriptions>
                 </View>
-                <BxDescriptions style={{ marginLeft: 40 }}>
-                    {listDescription(dataGrap)}
-                </BxDescriptions>
-            </View>
-   
-            <Surface style={{ marginTop: 10, padding: 2, borderRadius: 10, flex: 1 }}>
-    
-                {ItemMonths(dataGrap)}
-            </Surface>
-
-            <Snackbar
-                visible={visibleSnack}
-                style={styleSnack ? { backgroundColor: '#00C441' } : { backgroundColor: '#f64a4a' }}
-                onDismiss={onDismissSnackBar}
-                action={{
-                    label: 'Sair',
-                    onPress: () => { onDismissSnackBar() }
-                }}>
-                <Txt style={{ color: '#fff', textAlign: 'center' }}>
-                    {messageSnack}
-                </Txt>
-            </Snackbar>
+                <Surface style={{ marginTop: 10, padding: 2, borderRadius: 10, flex: 1 }}>
+                    {ItemMonths(dataGrap)}
+                </Surface>
+                <Snackbar
+                    visible={visibleSnack}
+                    style={styleSnack ? { backgroundColor: '#00C441' } : { backgroundColor: '#f64a4a' }}
+                    onDismiss={onDismissSnackBar}
+                    action={{
+                        label: 'Sair',
+                        onPress: () => { onDismissSnackBar() }
+                    }}>
+                    <Txt style={{ color: '#fff', textAlign: 'center' }}>
+                        {messageSnack}
+                    </Txt>
+                </Snackbar>
             </ScrollView>
         </Surface>
     )

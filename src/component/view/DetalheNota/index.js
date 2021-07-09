@@ -1,4 +1,4 @@
-import React, {Component, useEffect} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {ListF} from './style';
 import {StatusBar, View, Text} from 'react-native';
 import {Container, Body} from './style';
@@ -6,15 +6,16 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Produtos from './Repository';
 import { Surface, Button, IconButton, Title, Divider, ActivityIndicator } from 'react-native-paper';
 import {stringDate} from '../../bibliotecas_functions'
+
 //
-
-import { InterstitialAd, AdEventType } from '@react-native-firebase/admob';
 import { BannerAd, BannerAdSize } from '@react-native-firebase/admob';
-import {IDBanner, IDintersiial} from '../../variaveis'
-import { useState } from 'react/cjs/react.development';
-const adUnitId = IDBanner;
+import { InterstitialAd, AdEventType } from '@react-native-firebase/admob';
+import { IDBanner, IDintersiial } from '../../variaveis'
 
-const interstitial = InterstitialAd.createForAdRequest(IDintersiial, {
+const adUnitId = IDintersiial;
+const BannerId = IDBanner;
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
   keywords: ['fashion', 'clothing'],
 });
@@ -25,17 +26,28 @@ export default function DetalheNota({route, navigation}) {
   const [animating, setAnimating] = useState(true)
 
   useEffect(() => {
+
+    setTimeout(() => {
+      setData(route.params.data);
+    }, 1100);
+    /*
     interstitial.load()
-    interstitial.onAdEvent(type => {
-      if (type === AdEventType.LOADED) {
-        setTimeout(() => {
+    interstitial.onAdEvent(type=>{
+
+      if(type === AdEventType.LOADED){
           interstitial.show();
-        }, 2500);
       }
-      if (type === AdEventType.CLOSED) {
-        setData(route.params.data)
+      if(type ===AdEventType.CLOSED){
+        setAnimating(false)
+
       }
-    })
+      if(type == 'error'){
+        setData(route.params.data);
+        setAnimating(false)
+
+      }
+    })*/
+
   }, []);
 
   return (
@@ -86,14 +98,26 @@ export default function DetalheNota({route, navigation}) {
        <ActivityIndicator animating={animating} />
         </View>
     </View>  }
-
-      <BannerAd
-      unitId={adUnitId}
+    {data ?    <BannerAd
+      unitId={BannerId}
       size={BannerAdSize.FULL_BANNER}
       requestOptions={{
         requestNonPersonalizedAdsOnly: true,
       }}
-    />
+    />:   
+    <View style={{justifyContent:'center', alignItems:'center', marginTop: -100, marginBottom: 100}}>
+    <BannerAd
+    unitId={BannerId}
+    size={BannerAdSize.MEDIUM_RECTANGLE}
+    requestOptions={{
+      requestNonPersonalizedAdsOnly: true,
+    }}
+  />
+    </View>
+
+    }
+
+
     </Surface>
   );
 }

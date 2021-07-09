@@ -23,17 +23,11 @@ import { stringDate } from '../bibliotecas_functions'
 
 import { getNotas, onDelete } from '../../Controller/ControllerNotas';
 import MenssagemLength from '../MenssagemLength'
-import { InterstitialAd, AdEventType, TestIds } from '@react-native-firebase/admob';
-import { IDintersiial } from '../variaveis'
+
 import UserAuth from '../../business/auth'
 import TabsBox from '../TabsBox'
 import Grap from '../Grap'
-const adUnitId = IDintersiial;
 
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  requestNonPersonalizedAdsOnly: true,
-  keywords: ['fashion', 'clothing'],
-});
 
 export default function Dashbard({ navigation }) {
 
@@ -337,7 +331,9 @@ export default function Dashbard({ navigation }) {
       <View style={{ flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
         <Grap translateY={translateY} />
         <TabsBox translateY={translateY} />
+
         <View></View>
+
       </View>
 
 
@@ -370,6 +366,7 @@ export default function Dashbard({ navigation }) {
 
           <View style={{borderRadius: 5, margin: 5, padding: 5}}>
           {ItemNota(nota)}
+
           </View>
 
          
